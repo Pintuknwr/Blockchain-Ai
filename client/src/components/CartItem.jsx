@@ -8,10 +8,8 @@ export default function CartItem({ item, updateQty, removeItem }) {
 					className="w-20 h-20 object-contain rounded"
 				/>
 				<div>
-					<h4 className="text-lg font-semibold text-gray-800 dark:text-white">
-						{item.name}
-					</h4>
-					<p className="text-gray-600 dark:text-gray-300">
+					<h4 className="text-lg font-semibold text-gray-800">{item.name}</h4>
+					<p className="text-gray-600">
 						${item.price} x {item.quantity}
 					</p>
 				</div>
@@ -19,13 +17,13 @@ export default function CartItem({ item, updateQty, removeItem }) {
 			<div className="flex items-center gap-2">
 				<button
 					onClick={() => updateQty(item.id, item.quantity - 1)}
-					className="px-2 py-1 bg-gray-200 dark:bg-gray-600 rounded">
+					className="px-2 py-1 bg-gray-200 rounded">
 					−
 				</button>
 				<span className="font-semibold">{item.quantity}</span>
 				<button
 					onClick={() => updateQty(item.id, item.quantity + 1)}
-					className="px-2 py-1 bg-gray-200 dark:bg-gray-600 rounded">
+					className="px-2 py-1 bg-gray-200 rounded">
 					+
 				</button>
 				<button

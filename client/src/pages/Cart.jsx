@@ -12,16 +12,16 @@ export default function Cart() {
 	);
 
 	return (
-		<div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6">
+		<div className="min-h-screen bg-gray-100 p-6">
 			<div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-6">
 				{/* Cart Items Section */}
 				<div className="flex-1">
-					<h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
+					<h2 className="text-2xl font-bold mb-4 text-gray-800">
 						Your Cart ({cart.length} {cart.length === 1 ? "item" : "items"})
 					</h2>
 
 					{cart.length === 0 ? (
-						<p className="text-gray-600 dark:text-gray-300">
+						<p className="text-gray-600">
 							Your cart is empty.{" "}
 							<Link to="/" className="text-blue-600 hover:underline">
 								Go shopping
@@ -44,11 +44,11 @@ export default function Cart() {
 
 				{/* Checkout Panel */}
 				{cart.length > 0 && (
-					<div className="w-full md:w-1/3 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 sticky top-20 h-fit">
-						<h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
+					<div className="w-full md:w-1/3 bg-white shadow-lg rounded-lg p-6 sticky top-20 h-fit">
+						<h3 className="text-xl font-semibold mb-4 text-gray-800 ">
 							Order Summary
 						</h3>
-						<div className="space-y-2 text-gray-700 dark:text-gray-200">
+						<div className="space-y-2 text-gray-700">
 							<div className="flex justify-between">
 								<span>Subtotal</span>
 								<span>${subtotal.toFixed(2)}</span>

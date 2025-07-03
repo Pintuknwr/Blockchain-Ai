@@ -2,14 +2,14 @@ import { Link } from "react-router-dom";
 
 export default function ProductCard({ product }) {
 	return (
-		<div className="bg-white dark:bg-gray-900 rounded-xl shadow hover:shadow-lg transition overflow-hidden">
+		<div className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden">
 			<img
 				src={product.image}
 				alt={product.name}
 				className="w-full h-56 object-cover"
 			/>
 			<div className="p-4">
-				<h3 className="font-semibold text-lg text-gray-800 dark:text-white truncate">
+				<h3 className="font-semibold text-lg text-gray-800 truncate">
 					{product.name}
 				</h3>
 				<p className="text-blue-600 font-bold mt-1">${product.price}</p>
