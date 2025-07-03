@@ -1,9 +1,7 @@
 export default function Checkout() {
 	return (
 		<div className="max-w-xl mx-auto px-4 py-8">
-			<h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">
-				Checkout
-			</h2>
+			<h2 className="text-2xl font-bold mb-6 text-gray-800 ">Checkout</h2>
 			<form className="space-y-4">
 				<input
 					type="text"

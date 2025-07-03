@@ -1,6 +1,6 @@
 export default function Footer() {
 	return (
-		<footer className="bg-[#f3f3f3] bg-gray-300 text-gray-600 text-gray-900 pt-10 pb-6 mt-12">
+		<footer className="bg-[#f3f3f3] bg-gray-300 text-gray-900 pt-10 pb-6 mt-12">
 			<div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
 				<div>
 					<h4 className="font-bold mb-2">Customer Service</h4>
@@ -35,7 +35,7 @@ export default function Footer() {
 					</ul>
 				</div>
 			</div>
-			<div className="text-center text-xs mt-8 text-gray-800 dark:text-gray-400">
+			<div className="text-center text-xs mt-8 text-gray-800 ">
 				&copy; 2025 WalmartLite. All rights reserved.
 			</div>
 		</footer>

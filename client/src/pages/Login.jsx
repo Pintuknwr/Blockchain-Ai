@@ -27,9 +27,9 @@ export default function Login() {
 	};
 
 	return (
-		<div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4">
-			<div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 w-full max-w-md">
-				<h2 className="text-2xl font-bold mb-6 text-center text-gray-900 dark:text-white">
+		<div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+			<div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
+				<h2 className="text-2xl font-bold mb-6 text-center text-gray-900">
 					{isSignUp ? "Create an Account" : "Sign In to WalmartLite"}
 				</h2>
 
@@ -44,7 +44,7 @@ export default function Login() {
 						value={form.email}
 						onChange={handleChange}
 						placeholder="Email"
-						className="w-full px-4 py-2 rounded border focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+						className="w-full px-4 py-2 rounded border focus:outline-none focus:ring-2 focus:ring-blue-500"
 						required
 					/>
 					<input
@@ -53,7 +53,7 @@ export default function Login() {
 						value={form.password}
 						onChange={handleChange}
 						placeholder="Password"
-						className="w-full px-4 py-2 rounded border focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+						className="w-full px-4 py-2 rounded border focus:outline-none focus:ring-2 focus:ring-blue-500"
 						required
 					/>
 					{isSignUp && (
@@ -63,7 +63,7 @@ export default function Login() {
 							value={form.confirm}
 							onChange={handleChange}
 							placeholder="Confirm Password"
-							className="w-full px-4 py-2 rounded border focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+							className="w-full px-4 py-2 rounded border focus:outline-none focus:ring-2 focus:ring-blue-500"
 							required
 						/>
 					)}
@@ -75,14 +75,14 @@ export default function Login() {
 					</button>
 				</form>
 
-				<p className="text-sm text-center text-gray-600 dark:text-gray-300 mt-4">
+				<p className="text-sm text-center text-gray-600 mt-4">
 					{isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
 					<button
 						onClick={() => {
 							setError("");
 							setIsSignUp(!isSignUp);
 						}}
-						className="text-blue-600 hover:underline dark:text-yellow-400">
+						className="text-blue-600 hover:underline">
 						{isSignUp ? "Sign In" : "Sign Up"}
 					</button>
 				</p>
