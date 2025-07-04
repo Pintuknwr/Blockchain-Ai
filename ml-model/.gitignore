@@ -1,0 +1,37 @@
+# Python cache and build
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+env/
+venv/
+
+# Data files (don't push real or synthetic transaction data)
+data/
+*.csv
+*.json
+
+# Trained models
+model/
+*.joblib
+*.pkl
+*.h5
+*.keras
+
+# SHAP explanation cache (if any)
+explainer_cache/
+
+# Logs
+*.log
+
+# Jupyter/IPython
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+Thumbs.db
