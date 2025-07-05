@@ -1,13 +1,11 @@
-const logToBlockchain = require("../utils/logToBlockchain");
+const getLoggedEvents = require("../utils/getLoggedEvents");
 
-exports.logTransaction = async (req, res) => {
-	const { user, amount, status, reason } = req.body;
-
+exports.getAllTransactions = async (req, res) => {
 	try {
-		const tx = await logToBlockchain(user, amount, status, reason);
-		res.status(200).json({ message: "Logged to blockchain", txHash: tx.hash });
+		const events = await getLoggedEvents();
+		res.status(200).json(events);
 	} catch (err) {
-		console.error("Blockchain logging failed:", err);
-		res.status(500).json({ error: "Failed to log transaction" });
+		console.error("Failed to fetch events:", err);
+		res.status(500).json({ message: "Error fetching blockchain logs" });
 	}
 };
