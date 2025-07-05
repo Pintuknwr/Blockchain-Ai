@@ -16,8 +16,12 @@ class Transaction(BaseModel):
 # Prediction route
 @app.post("/predict")
 def predict(tx: Transaction):
-    result = model.predict([tx.features])[0]
-    return {"fraud": bool(result)}
+    probs = model.predict_proba([tx.features])[0]  # get probability
+    result = int(probs[1] > 0.5)  # class 1 = fraud
+    print(f"Features: {tx.features}")
+    print(f"Probability: {probs}, Fraud: {bool(result)}")
+    return {"fraud": bool(result), "probability": float(probs[1])}
+
 
 # Import explanation logic
 from explainability.shap_explainer import explain
