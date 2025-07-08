@@ -27,6 +27,19 @@ export default function Checkout() {
 		try {
 			const token = localStorage.getItem("token");
 
+			if (!token) {
+				setError("You're not logged in.");
+				setLoading(false);
+				return;
+			}
+
+			console.log("📦 Sending transaction log:", {
+				user: user?._id,
+				amount: subtotal,
+				status: "success",
+				reason: "normal",
+			});
+
 			await axios.post(
 				"/api/transactions/log",
 				{
@@ -45,8 +58,8 @@ export default function Checkout() {
 			setSuccess(true);
 			setTimeout(() => navigate("/"), 2000); // redirect after 2s
 		} catch (err) {
+			console.error("❌ Axios Error:", err.response?.data || err.message);
 			setError("Transaction failed. Try again.");
-			console.error(err);
 		} finally {
 			setLoading(false);
 		}

@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import axios from "../api/axios"; // 👈 Axios instance with baseURL
+import axios from "../api/axios";
 
 const AuthContext = createContext();
 
@@ -7,11 +7,22 @@ export function AuthProvider({ children }) {
 	const [user, setUser] = useState(null);
 	const [loading, setLoading] = useState(true);
 
-	// 🔄 Auto-load user if token/session exists
 	useEffect(() => {
 		const fetchUser = async () => {
+			const token = localStorage.getItem("token");
+
+			if (!token) {
+				setUser(null);
+				setLoading(false);
+				return;
+			}
+
 			try {
-				const res = await axios.get("/user/me");
+				const res = await axios.get("/user/me", {
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				});
 				setUser(res.data.user || res.data);
 			} catch (err) {
 				setUser(null);
@@ -23,7 +34,6 @@ export function AuthProvider({ children }) {
 		fetchUser();
 	}, []);
 
-	// 1️⃣ Login Function
 	const login = async (email, password, clientInfo = {}) => {
 		try {
 			const res = await axios.post("/user/login", {
@@ -39,50 +49,59 @@ export function AuthProvider({ children }) {
 				};
 			}
 
-			setUser(res.data.user);
+			localStorage.setItem("token", res.data.token);
+			setUser({
+				_id: res.data._id,
+				name: res.data.name,
+				email: res.data.email,
+				role: res.data.role,
+			});
+
 			return { mfaRequired: false };
 		} catch (err) {
 			throw new Error(err.response?.data?.message || "Login failed");
 		}
 	};
 
-	// 2️⃣ MFA Verification
 	const verifyMFA = async (tempToken, code) => {
 		try {
 			const res = await axios.post("/user/verify-mfa", {
 				tempToken,
 				code,
 			});
+			localStorage.setItem("token", res.data.token);
 			setUser(res.data.user);
 		} catch (err) {
 			throw new Error(err.response?.data?.message || "2FA failed");
 		}
 	};
 
-	// 3️⃣ Register
-	const register = async (email, password, clientInfo = {}) => {
+	const register = async (email, password, clientInfo = {}, name = "") => {
 		try {
 			const res = await axios.post("/user/register", {
+				name,
 				email,
 				password,
 				clientInfo,
 			});
+			localStorage.setItem("token", res.data.token);
 			setUser(res.data.user);
 		} catch (err) {
 			throw new Error(err.response?.data?.message || "Registration failed");
 		}
 	};
 
-	// 🔒 Logout
 	const logout = async () => {
 		try {
 			await axios.post("/user/logout");
 		} catch {}
+		localStorage.removeItem("token");
 		setUser(null);
 	};
 
 	return (
-		<AuthContext.Provider value={{ user, login, verifyMFA, register, logout, loading }}>
+		<AuthContext.Provider
+			value={{ user, login, verifyMFA, register, logout, loading }}>
 			{children}
 		</AuthContext.Provider>
 	);

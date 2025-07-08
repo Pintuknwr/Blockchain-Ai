@@ -1,7 +1,16 @@
 export const getClientInfo = async () => {
 	try {
-		// Fetch IP via backend proxy to avoid CORS issues
 		const ipRes = await fetch("/api/utils/get-ip");
+
+		const contentType = ipRes.headers.get("content-type");
+		if (
+			!ipRes.ok ||
+			!contentType ||
+			!contentType.includes("application/json")
+		) {
+			throw new Error("Not a valid JSON response");
+		}
+
 		const { ip } = await ipRes.json();
 
 		const ua = navigator.userAgent;
@@ -16,7 +25,7 @@ export const getClientInfo = async () => {
 			timestamp: new Date().toISOString(),
 		};
 	} catch (err) {
-		console.error("Failed to get client info", err);
+		console.error("❌ Failed to get client info", err.message);
 		return {
 			ip: "unknown",
 			userAgent: navigator.userAgent,
