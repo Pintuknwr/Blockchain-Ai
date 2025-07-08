@@ -9,6 +9,7 @@ const {
 	verifyPasswordOtpAndReset,
 	requestMfaOtp,
 	verifyMfaOtp,
+	verifyMfaCode,
 } = require("../controllers/userController");
 const { protect } = require("../middlewares/authMiddleware");
 
@@ -23,5 +24,6 @@ router.post("/request-otp", requestPasswordOtp);
 router.post("/reset-password-otp", verifyPasswordOtpAndReset);
 router.post("/request-mfa-otp", requestMfaOtp);
 router.post("/verify-mfa-otp", verifyMfaOtp);
+router.post("/verify-mfa", verifyMfaCode);
 
 module.exports = router;
