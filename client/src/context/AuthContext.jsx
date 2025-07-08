@@ -1,58 +1,88 @@
-import { createContext, useContext, useState } from "react";
-import axios from "axios";
+import { createContext, useContext, useState, useEffect } from "react";
+import axios from "../api/axios"; // 👈 Axios instance with baseURL
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
 	const [user, setUser] = useState(null);
+	const [loading, setLoading] = useState(true);
 
-	// 1️⃣ Step 1: Try Login (may return MFA required)
-	const login = async (email, password) => {
+	// 🔄 Auto-load user if token/session exists
+	useEffect(() => {
+		const fetchUser = async () => {
+			try {
+				const res = await axios.get("/user/me");
+				setUser(res.data.user || res.data);
+			} catch (err) {
+				setUser(null);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		fetchUser();
+	}, []);
+
+	// 1️⃣ Login Function
+	const login = async (email, password, clientInfo = {}) => {
 		try {
-			const res = await axios.post("/api/auth/login", {
+			const res = await axios.post("/user/login", {
 				email,
 				password,
+				clientInfo,
 			});
 
 			if (res.data?.mfaRequired) {
-				// Step 1 complete, wait for 2FA
 				return {
 					mfaRequired: true,
-					tempToken: res.data.tempToken, // store to verify later
+					tempToken: res.data.tempToken,
 				};
 			}
 
-			// Success: No MFA required
-			setUser(res.data.user); // or res.data
-			localStorage.setItem("token", res.data.token); // optional
+			setUser(res.data.user);
 			return { mfaRequired: false };
 		} catch (err) {
-			throw new Error("Login failed");
+			throw new Error(err.response?.data?.message || "Login failed");
 		}
 	};
 
-	// 2️⃣ Step 2: Submit MFA Code
+	// 2️⃣ MFA Verification
 	const verifyMFA = async (tempToken, code) => {
 		try {
-			const res = await axios.post("/api/auth/verify-2fa", {
-				token: tempToken,
+			const res = await axios.post("/user/verify-mfa", {
+				tempToken,
 				code,
 			});
-
 			setUser(res.data.user);
-			localStorage.setItem("token", res.data.token); // optional
 		} catch (err) {
-			throw new Error("2FA failed");
+			throw new Error(err.response?.data?.message || "2FA failed");
 		}
 	};
 
-	const logout = () => {
+	// 3️⃣ Register
+	const register = async (email, password, clientInfo = {}) => {
+		try {
+			const res = await axios.post("/user/register", {
+				email,
+				password,
+				clientInfo,
+			});
+			setUser(res.data.user);
+		} catch (err) {
+			throw new Error(err.response?.data?.message || "Registration failed");
+		}
+	};
+
+	// 🔒 Logout
+	const logout = async () => {
+		try {
+			await axios.post("/user/logout");
+		} catch {}
 		setUser(null);
-		localStorage.removeItem("token");
 	};
 
 	return (
-		<AuthContext.Provider value={{ user, login, verifyMFA, logout }}>
+		<AuthContext.Provider value={{ user, login, verifyMFA, register, logout, loading }}>
 			{children}
 		</AuthContext.Provider>
 	);
