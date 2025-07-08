@@ -5,11 +5,16 @@ import MFAInput from "../components/MFAInput";
 import { getClientInfo } from "../utils/clientInfo";
 
 export default function Login() {
-	const { login, verifyMFA } = useAuth();
+	const { login, register, verifyMFA } = useAuth();
 	const navigate = useNavigate();
 
 	const [isSignUp, setIsSignUp] = useState(false);
-	const [form, setForm] = useState({ email: "", password: "", confirm: "" });
+	const [form, setForm] = useState({
+		name: "",
+		email: "",
+		password: "",
+		confirm: "",
+	});
 	const [error, setError] = useState("");
 	const [loading, setLoading] = useState(false);
 	const [mfaStep, setMfaStep] = useState(false);
@@ -22,27 +27,46 @@ export default function Login() {
 		e.preventDefault();
 		setError("");
 
-		if (isSignUp && form.password !== form.confirm) {
-			return setError("Passwords do not match");
-		}
 		if (!form.email || !form.password) {
 			return setError("Email and password are required");
+		}
+
+		if (isSignUp) {
+			if (!form.name) {
+				return setError("Name is required");
+			}
+			if (form.password !== form.confirm) {
+				return setError("Passwords do not match");
+			}
 		}
 
 		setLoading(true);
 
 		try {
 			const clientInfo = await getClientInfo();
-			const result = await login(form.email, form.password, clientInfo);
 
-			if (result.mfaRequired) {
-				setTempToken(result.tempToken);
-				setMfaStep(true);
+			if (isSignUp) {
+				await register(form.email, form.password, clientInfo, form.name);
+				setIsSignUp(false);
+				setForm({
+					name: "",
+					email: "",
+					password: "",
+					confirm: "",
+				});
+				setError("Account created! Please log in.");
 			} else {
-				navigate("/");
+				const result = await login(form.email, form.password, clientInfo);
+
+				if (result.mfaRequired) {
+					setTempToken(result.tempToken);
+					setMfaStep(true);
+				} else {
+					navigate("/");
+				}
 			}
 		} catch (err) {
-			setError(err.message || "Login failed");
+			setError(err.message || "Authentication failed");
 		} finally {
 			setLoading(false);
 		}
@@ -81,6 +105,17 @@ export default function Login() {
 					<MFAInput onSubmit={handleMfaSubmit} loading={loading} />
 				) : (
 					<form onSubmit={handleSubmit} className="space-y-4">
+						{isSignUp && (
+							<input
+								type="text"
+								name="name"
+								value={form.name}
+								onChange={handleChange}
+								placeholder="Full Name"
+								className="w-full px-4 py-2 rounded border focus:outline-none focus:ring-2 focus:ring-blue-500"
+								required
+							/>
+						)}
 						<input
 							type="email"
 							name="email"

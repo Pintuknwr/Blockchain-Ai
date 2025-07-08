@@ -4,9 +4,11 @@ const {
 	logTransaction,
 	getAllTransactions,
 } = require("../controllers/transactionController");
-const { protect } = require("../middlewares/authMiddleware");
+const { protect, adminOnly } = require("../middlewares/authMiddleware");
 
 router.post("/log", protect, logTransaction);
-router.get("/all", protect, getAllTransactions); // new route
+// router.post("/log", logTransaction);
+// router.get("/all", getAllTransactions); // new route
+router.get("/all", protect, adminOnly, getAllTransactions); // new route
 
 module.exports = router;
