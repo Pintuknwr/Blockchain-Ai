@@ -102,7 +102,15 @@ export default function Login() {
 				)}
 
 				{mfaStep ? (
-					<MFAInput onSubmit={handleMfaSubmit} loading={loading} />
+					<>
+						<MFAInput onSubmit={handleMfaSubmit} loading={loading} />
+
+						<p
+							onClick={() => navigate("/recover-mfa")}
+							className="text-sm text-blue-600 hover:underline mt-4 cursor-pointer text-center">
+							❓ Can’t access your MFA code?
+						</p>
+					</>
 				) : (
 					<form onSubmit={handleSubmit} className="space-y-4">
 						{isSignUp && (
@@ -152,6 +160,12 @@ export default function Login() {
 							disabled={loading}>
 							{loading ? "Processing..." : isSignUp ? "Sign Up" : "Sign In"}
 						</button>
+
+						<p
+							onClick={() => navigate("/forgot-password")}
+							className="text-sm text-blue-600 hover:underline mt-3 cursor-pointer text-center">
+							Forgot Password?
+						</p>
 					</form>
 				)}
 
