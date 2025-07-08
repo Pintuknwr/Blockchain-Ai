@@ -19,4 +19,4 @@ model.fit(X_train, y_train)
 
 # Save model
 dump(model, "model/fraud_model.joblib")
-print("✅ Model trained and saved to model/fraud_model.joblib")
+print("Model trained and saved to model/fraud_model.joblib")
