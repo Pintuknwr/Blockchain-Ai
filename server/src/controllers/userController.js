@@ -1,81 +1,246 @@
-const User = require('../models/userModels.js');
-const jwt = require('jsonwebtoken');
+const User = require("../models/userModels.js");
+const jwt = require("jsonwebtoken");
+const speakeasy = require("speakeasy");
+const qrcode = require("qrcode");
+const sendEmail = require("../utils/sendEmail");
 
 // Generate token
 const generateToken = (id, role) => {
-  return jwt.sign({ id, role }, process.env.JWT_SECRET, 
-    { expiresIn: '30d' });
+	return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: "30d" });
 };
 
 // @desc Register user
 exports.registerUser = async (req, res) => {
-  const { name, email, password } = req.body;
+	const { name, email, password } = req.body;
 
-  // Basic validation
-  if (!name || !email || !password) {
-    return res.status(400).json({ message: 'Please provide name, email, and password.' });
-  }
+	// Basic validation
+	if (!name || !email || !password) {
+		return res
+			.status(400)
+			.json({ message: "Please provide name, email, and password." });
+	}
 
-  try {
-    const userExists = await User.findOne({ email });
-    if (userExists) {
-      return res.status(400).json({ message: 'User with this email already exists.' });
-    }
+	try {
+		const userExists = await User.findOne({ email });
+		if (userExists) {
+			return res
+				.status(400)
+				.json({ message: "User with this email already exists." });
+		}
 
-    // Try to create the user
-    const user = new User({ name, email, password });
-    const savedUser = await user.save();
+		// Try to create the user
+		const user = new User({ name, email, password });
+		const savedUser = await user.save();
 
-    // Check if saved successfully
-    if (!savedUser || !savedUser._id) {
-      return res.status(500).json({ message: 'User creation failed. Could not save to database.' });
-    }
+		// Check if saved successfully
+		if (!savedUser || !savedUser._id) {
+			return res
+				.status(500)
+				.json({ message: "User creation failed. Could not save to database." });
+		}
 
-    // Return success response
-    return res.status(201).json({
-      message: 'User created successfully',
-      user: {
-        _id: savedUser._id,
-        name: savedUser.name,
-        email: savedUser.email,
-        role: savedUser.role,
-      },
-      token: generateToken(savedUser._id, savedUser.role)
-    });
-
-  } catch (error) {
-    console.error('Registration Error:', error);
-    return res.status(500).json({
-      message: 'Internal server error during registration',
-      error: error.message || 'Unknown error'
-    });
-  }
+		// Return success response
+		return res.status(201).json({
+			message: "User created successfully",
+			user: {
+				_id: savedUser._id,
+				name: savedUser.name,
+				email: savedUser.email,
+				role: savedUser.role,
+			},
+			token: generateToken(savedUser._id, savedUser.role),
+		});
+	} catch (error) {
+		console.error("Registration Error:", error);
+		return res.status(500).json({
+			message: "Internal server error during registration",
+			error: error.message || "Unknown error",
+		});
+	}
 };
-
 
 // @desc Login user
 exports.loginUser = async (req, res) => {
-  const { email, password } = req.body;
-  try {
-    const user = await User.findOne({ email });
-    if (!user || !(await user.matchPassword(password))) {
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
+	const { email, password } = req.body;
 
-    res.json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      token: generateToken(user._id, user.role)
-    });
-  } catch (error) {
-    res.status(500).json({ message: 'Login failed', error });
-  }
+	const user = await User.findOne({ email });
+	if (!user || !(await user.matchPassword(password))) {
+		return res.status(401).json({ message: "Invalid credentials" });
+	}
+
+	// ✅ If MFA is enabled, return temp token
+	if (user.isMfaEnabled) {
+		const tempToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+			expiresIn: "10m",
+		});
+		return res.json({ mfaRequired: true, tempToken });
+	}
+
+	// ✅ If MFA not enabled, return full access token
+	const token = jwt.sign(
+		{ id: user._id, role: user.role },
+		process.env.JWT_SECRET,
+		{
+			expiresIn: "30d",
+		}
+	);
+
+	res.json({
+		_id: user._id,
+		name: user.name,
+		email: user.email,
+		role: user.role,
+		isMfaEnabled: user.isMfaEnabled, // ✅ include this
+		token,
+	});
 };
 
 // @desc Get current user
 exports.getMe = async (req, res) => {
-  const user = await User.findById(req.user.id).select('-password');
-  res.status(200).json(user);
+	const user = await User.findById(req.user.id).select("-password");
+	res.status(200).json(user);
+};
+
+// GET /user/enable-mfa
+exports.generateMfaSecret = async (req, res) => {
+	try {
+		const secret = speakeasy.generateSecret({
+			name: `WalmartLite (${req.user.email})`,
+		});
+
+		const qrUrl = await qrcode.toDataURL(secret.otpauth_url);
+		res.json({ base32: secret.base32, qrUrl });
+	} catch (err) {
+		console.error("🔴 MFA QR Generation Error:", err);
+		res.status(500).json({ message: "Failed to generate MFA secret" });
+	}
+};
+
+// POST /user/confirm-mfa
+exports.confirmMfaCode = async (req, res) => {
+	const { code, secret } = req.body;
+
+	const verified = speakeasy.totp.verify({
+		secret,
+		encoding: "base32",
+		token: code,
+		window: 1,
+	});
+
+	if (!verified) {
+		return res.status(400).json({ message: "Invalid MFA code" });
+	}
+
+	req.user.mfaSecret = secret;
+	req.user.isMfaEnabled = true;
+	await req.user.save(); // ✅ Must save it!
+
+	res.json({ message: "MFA enabled successfully!" });
+};
+
+exports.requestPasswordOtp = async (req, res) => {
+	const { email } = req.body;
+	const user = await User.findOne({ email });
+
+	if (!user) return res.status(404).json({ message: "User not found" });
+
+	const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+	user.resetOtp = otp;
+	user.resetOtpExpiry = Date.now() + 10 * 60 * 1000; // 10 minutes
+	await user.save();
+
+	await sendEmail(
+		user.email,
+		"Your OTP for Password Reset",
+		`Your 6-digit OTP is: ${otp}. It is valid for 10 minutes.`
+	);
+
+	res.json({ message: "OTP sent to email" });
+};
+
+exports.verifyPasswordOtpAndReset = async (req, res) => {
+	const { email, otp, newPassword } = req.body;
+
+	const user = await User.findOne({ email });
+
+	if (
+		!user ||
+		user.resetOtp !== otp ||
+		!user.resetOtpExpiry ||
+		user.resetOtpExpiry < Date.now()
+	) {
+		return res.status(400).json({ message: "Invalid or expired OTP" });
+	}
+
+	user.password = newPassword;
+	user.resetOtp = undefined;
+	user.resetOtpExpiry = undefined;
+	await user.save();
+
+	res.json({ message: "Password reset successful" });
+};
+
+exports.requestMfaOtp = async (req, res) => {
+	const { email } = req.body;
+	const user = await User.findOne({ email });
+
+	if (!user || !user.isMfaEnabled) {
+		return res.status(400).json({ message: "No MFA enabled for this user." });
+	}
+
+	const otp = Math.floor(100000 + Math.random() * 900000).toString();
+	user.resetOtp = otp;
+	user.resetOtpExpiry = Date.now() + 10 * 60 * 1000; // 10 min
+	await user.save();
+
+	await sendEmail(
+		email,
+		"MFA Recovery OTP",
+		`Your OTP to recover MFA is: ${otp}. It expires in 10 minutes.`
+	);
+
+	res.json({ message: "OTP sent to email." });
+};
+
+exports.verifyMfaOtp = async (req, res) => {
+	const { email, otp } = req.body;
+
+	const user = await User.findOne({ email });
+	if (
+		!user ||
+		user.resetOtp !== otp ||
+		!user.resetOtpExpiry ||
+		user.resetOtpExpiry < Date.now()
+	) {
+		return res.status(400).json({ message: "Invalid or expired OTP" });
+	}
+
+	// Disable MFA
+	user.isMfaEnabled = false;
+	user.mfaSecret = undefined;
+	user.resetOtp = undefined;
+	user.resetOtpExpiry = undefined;
+	await user.save();
+
+	// Generate full token and log in
+	const token = jwt.sign(
+		{ id: user._id, role: user.role },
+		process.env.JWT_SECRET,
+		{
+			expiresIn: "30d",
+		}
+	);
+
+	res.json({
+		message: "MFA disabled. Login successful.",
+		user: {
+			_id: user._id,
+			name: user.name,
+			email: user.email,
+			role: user.role,
+			isMfaEnabled: false,
+		},
+		token,
+	});
 };

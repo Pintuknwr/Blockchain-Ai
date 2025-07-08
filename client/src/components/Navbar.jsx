@@ -5,13 +5,18 @@ import { Search, X } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 const descriptions = {
-	Departments: "Explore a wide variety of departments...",
-	Deals: "Never miss a deal again!",
-	Pharmacy: "Manage your prescriptions...",
-	Auto: "Shop for all your vehicle needs...",
-	Electronics: "Find the latest in electronics...",
-	Grocery: "Shop fresh produce, dairy, meats...",
-	Home: "From furniture and decor to kitchen appliances...",
+	Departments:
+		"Explore a wide variety of departments including clothing, electronics, home improvement, beauty, baby products, toys, books, and more. Our departments help you shop with ease across categories tailored to your lifestyle.",
+	Deals:
+		"Never miss a deal again! Discover daily specials, rollback offers, clearance events, and exclusive online discounts. Save more every day whether you're shopping for essentials or big-ticket items.",
+	Pharmacy:
+		"Manage your prescriptions, book vaccine appointments, and shop health & wellness products—all in one place. Our pharmacy section provides access to trusted medications, refill reminders, and real-time updates.",
+	Auto: "Shop for all your vehicle needs including tires, oil, batteries, and accessories. Schedule installations, check tire fit, or browse automotive electronics and tools to keep your car running smoothly.",
+	Electronics:
+		"Find the latest in electronics from TVs, laptops, gaming consoles, smart home devices, cameras, and more. Whether you're a tech enthusiast or a casual user, we have something for everyone.",
+	Grocery:
+		"Shop fresh produce, dairy, meats, snacks, pantry staples, and organic goods. Enjoy same-day delivery or in-store pickup options for all your grocery needs—quick, affordable, and convenient.",
+	Home: "From furniture and decor to kitchen appliances and bedding, our home section brings comfort and style to your space. Explore collections curated to match every aesthetic and budget.",
 };
 
 export default function Navbar() {
@@ -25,7 +30,7 @@ export default function Navbar() {
 			<div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
 				<Link
 					to="/"
-					className="text-2xl font-bold tracking-tight hover:text-yellow-300 transition">
+					className="text-2xl text-yellow-300 font-bold tracking-tight hover:text-yellow-500 transition">
 					WalmartLite
 				</Link>
 
@@ -45,25 +50,35 @@ export default function Navbar() {
 
 					{user ? (
 						<div className="flex items-center gap-4">
-							<span className="text-sm">👋 {user.name}</span>
+							<span className="text-sm">Hi, {user.name}!</span>
 
 							{user.role === "admin" && (
 								<Link
 									to="/admin"
-									className="text-yellow-300 hover:underline font-semibold">
+									className="text-white hover:text-yellow-300 font-semibold">
 									Admin
 								</Link>
 							)}
 
+							<Link
+								to="/settings/security"
+								className="px-3 py-1 rounded text-white hover:bg-yellow-300 transition"
+								title="Manage 2FA (MFA)">
+								Security
+								{user?.isMfaEnabled && (
+									<span className="text-green-200">✅</span>
+								)}
+							</Link>
+
 							<button
 								onClick={logout}
-								className="bg-red-500 px-3 py-1 rounded hover:bg-red-600 transition">
+								className="px-3 py-1 rounded hover:bg-red-400 transition">
 								Logout
 							</button>
 						</div>
 					) : (
 						<Link to="/login" className="hover:text-yellow-300 transition">
-							🔐 Login
+							{/*🔐*/} Login
 						</Link>
 					)}
 				</div>

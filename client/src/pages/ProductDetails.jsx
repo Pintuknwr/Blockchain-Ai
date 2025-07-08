@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import products from "../data/products";
+import { toast } from "react-toastify";
 
 export default function ProductDetails() {
 	const { id } = useParams();
@@ -16,6 +17,14 @@ export default function ProductDetails() {
 			</div>
 		);
 	}
+
+	const handleAddToCart = (product) => {
+		addToCart(product);
+		toast.success("🛒 Item added to cart!", {
+			position: "top-right",
+			autoClose: 2000,
+		});
+	};
 
 	return (
 		<div className="max-w-5xl mx-auto px-4 py-8">
@@ -34,7 +43,7 @@ export default function ProductDetails() {
 					</p>
 					<p className="text-gray-600 mb-6">{product.description}</p>
 					<button
-						onClick={() => addToCart(product)}
+						onClick={() => handleAddToCart(product)}
 						className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
 						Add to Cart
 					</button>

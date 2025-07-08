@@ -55,6 +55,7 @@ export function AuthProvider({ children }) {
 				name: res.data.name,
 				email: res.data.email,
 				role: res.data.role,
+				isMfaEnabled: res.data.isMfaEnabled,
 			});
 
 			return { mfaRequired: false };
@@ -70,7 +71,13 @@ export function AuthProvider({ children }) {
 				code,
 			});
 			localStorage.setItem("token", res.data.token);
-			setUser(res.data.user);
+			setUser({
+				_id: res.data.user._id,
+				name: res.data.user.name,
+				email: res.data.user.email,
+				role: res.data.user.role,
+				isMfaEnabled: res.data.user.isMfaEnabled, // ✅ include this
+			});
 		} catch (err) {
 			throw new Error(err.response?.data?.message || "2FA failed");
 		}
@@ -93,10 +100,20 @@ export function AuthProvider({ children }) {
 
 	const logout = async () => {
 		try {
-			await axios.post("/user/logout");
-		} catch {}
+			await axios.post("/user/logout", null, {
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
+			});
+		} catch (err) {
+			console.warn("Logout request failed (ignoring)...", err.message);
+		}
+
 		localStorage.removeItem("token");
 		setUser(null);
+
+		// ✅ redirect to home
+		window.location.href = "/";
 	};
 
 	return (
