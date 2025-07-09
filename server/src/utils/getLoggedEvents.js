@@ -1,23 +1,33 @@
+// server/utils/getLoggedEvents.js
 const { ethers } = require("ethers");
 require("dotenv").config();
 const contractJson = require("./FraudLoggerABI.json");
 
-const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
-const contract = new ethers.Contract(
-	process.env.CONTRACT_ADDRESS,
-	contractJson.abi,
-	provider
-);
+const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS;
+
+
+const RPC_URL = process.env.RPC_URL;
+
+if (!CONTRACT_ADDRESS || !RPC_URL) {
+	throw new Error("❌ Missing CONTRACT_ADDRESS or RPC_URL in .env");
+}
+
+const provider = new ethers.JsonRpcProvider(RPC_URL);
+const contract = new ethers.Contract(CONTRACT_ADDRESS, contractJson.abi, provider);
+
+console.log("🔍 Logging to contract address:", contract.target || contract.address);
+
 
 async function getLoggedEvents() {
 	try {
-		const filter = contract.filters.FraudLogged(); // get all events
-		const events = await contract.queryFilter(filter, 0, "latest");
+		// In Ethers v6, you can directly use the event name
+		const logs = await contract.queryFilter("FraudLogged");
 
-		const results = await Promise.all(
-			events.map(async (e) => {
-				const block = await e.getBlock(); // get timestamp from block
+		console.log("📦 Events found:", logs.length);
 
+		const events = await Promise.all(
+			logs.map(async (e) => {
+				const block = await provider.getBlock(e.blockNumber);
 				return {
 					txHash: e.transactionHash,
 					txId: e.args.txId,
@@ -26,14 +36,14 @@ async function getLoggedEvents() {
 					reason: e.args.reason,
 					status: e.args.isFraud ? "Fraud" : "Legit",
 					blockNumber: e.blockNumber,
-					timestamp: new Date(block.timestamp * 1000).toISOString(), // convert to readable time
+					timestamp: new Date(block.timestamp * 1000).toISOString(),
 				};
 			})
 		);
 
-		return results;
+		return events;
 	} catch (err) {
-		console.error("❌ Error fetching blockchain events:", err.message);
+		console.error("❌ Error fetching blockchain logs:", err.message);
 		throw err;
 	}
 }
