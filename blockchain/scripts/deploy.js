@@ -5,7 +5,7 @@ async function main() {
 	const fraudLogger = await FraudLogger.deploy();
 	await fraudLogger.waitForDeployment();
 
-	console.log("✅ Contract deployed to:", fraudLogger.target);
+	console.log("Contract deployed to:", fraudLogger.target);
 }
 
 main().catch((error) => {

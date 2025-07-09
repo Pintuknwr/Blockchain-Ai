@@ -23,9 +23,10 @@ export default function AdminDashboard() {
 						Authorization: `Bearer ${token}`,
 					},
 				});
+				console.log("📊 Logs loaded:", res.data); // Debug
 				setLogs(res.data);
 			} catch (err) {
-				console.error("Error fetching logs:", err);
+				console.error("❌ Error fetching logs:", err);
 				setError("Failed to load logs");
 			} finally {
 				setLoading(false);
@@ -59,6 +60,7 @@ export default function AdminDashboard() {
 							<th className="px-4 py-2 text-left">Status</th>
 							<th className="px-4 py-2 text-left">Reason</th>
 							<th className="px-4 py-2 text-left">Block</th>
+							<th className="px-4 py-2 text-left">Time</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -68,15 +70,20 @@ export default function AdminDashboard() {
 								className="border-t hover:bg-gray-50 transition duration-150">
 								<td className="px-4 py-2 text-blue-600">{log.txHash}</td>
 								<td className="px-4 py-2">{log.user}</td>
-								<td className="px-4 py-2">{log.amount}</td>
+								<td className="px-4 py-2">${(log.amount / 100).toFixed(2)}</td>
 								<td
 									className={`px-4 py-2 font-medium ${
-										log.status === "fraud" ? "text-red-600" : "text-green-600"
+										(log.status || "").toLowerCase() === "fraud"
+											? "text-red-600"
+											: "text-green-600"
 									}`}>
 									{log.status}
 								</td>
 								<td className="px-4 py-2 text-gray-700">{log.reason}</td>
 								<td className="px-4 py-2 text-gray-500">{log.blockNumber}</td>
+								<td className="px-4 py-2 text-gray-400">
+									{new Date(log.timestamp).toLocaleString()}
+								</td>
 							</tr>
 						))}
 					</tbody>

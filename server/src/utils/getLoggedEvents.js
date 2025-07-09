@@ -1,4 +1,3 @@
-// server/utils/getLoggedEvents.js
 const { ethers } = require("ethers");
 require("dotenv").config();
 const contractJson = require("./FraudLoggerABI.json");
@@ -11,16 +10,32 @@ const contract = new ethers.Contract(
 );
 
 async function getLoggedEvents() {
-	const filter = contract.filters.FraudLogged(); // no filter params = all events
-	const events = await contract.queryFilter(filter, 0, "latest");
+	try {
+		const filter = contract.filters.FraudLogged(); // get all events
+		const events = await contract.queryFilter(filter, 0, "latest");
 
-	return events.map((e) => ({
-		txHash: e.transactionHash,
-		txId: e.args.txId,
-		isFraud: e.args.isFraud,
-		blockNumber: e.blockNumber,
-		timestamp: null, // we'll fill this in next step
-	}));
+		const results = await Promise.all(
+			events.map(async (e) => {
+				const block = await e.getBlock(); // get timestamp from block
+
+				return {
+					txHash: e.transactionHash,
+					txId: e.args.txId,
+					user: e.args.user,
+					amount: Number(e.args.amount),
+					reason: e.args.reason,
+					status: e.args.isFraud ? "Fraud" : "Legit",
+					blockNumber: e.blockNumber,
+					timestamp: new Date(block.timestamp * 1000).toISOString(), // convert to readable time
+				};
+			})
+		);
+
+		return results;
+	} catch (err) {
+		console.error("❌ Error fetching blockchain events:", err.message);
+		throw err;
+	}
 }
 
 module.exports = getLoggedEvents;
