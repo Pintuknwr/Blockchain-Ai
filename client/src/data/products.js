@@ -4,19 +4,19 @@ const dummyProducts = [
 	{
 		id: 1,
 		name: "Washing Machine",
-		price: 189.55,
+		price: 189,
 		image: assets.washing_machine,
 	},
 	{
 		id: 2,
 		name: "Body_Wash",
-		price: 10.99,
+		price: 10,
 		image: assets.body_wash,
 	},
 	{
 		id: 3,
 		name: "Dog Food",
-		price: 105.77,
+		price: 105,
 		image: assets.dog_food,
 	},
 	{
@@ -28,25 +28,25 @@ const dummyProducts = [
 	{
 		id: 5,
 		name: "Maxi Dress",
-		price: 48.79,
+		price: 48,
 		image: assets.maxi_dress,
 	},
 	{
 		id: 6,
 		name: "Sewing Machine",
-		price: 88.75,
+		price: 88,
 		image: assets.sewing_machine,
 	},
 	{
 		id: 7,
 		name: "Electric Toothbrush",
-		price: 79.94,
+		price: 79,
 		image: assets.toothbrush,
 	},
 	{
 		id: 8,
 		name: "Printer",
-		price: 179.5,
+		price: 179,
 		image: assets.printer,
 	},
 ];

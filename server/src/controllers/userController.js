@@ -117,6 +117,7 @@ exports.generateMfaSecret = async (req, res) => {
 };
 
 // POST /user/confirm-mfa
+
 exports.confirmMfaCode = async (req, res) => {
 	const { code, secret } = req.body;
 
@@ -133,7 +134,7 @@ exports.confirmMfaCode = async (req, res) => {
 
 	req.user.mfaSecret = secret;
 	req.user.isMfaEnabled = true;
-	await req.user.save(); // ✅ Must save it!
+	await req.user.save();
 
 	res.json({ message: "MFA enabled successfully!" });
 };
@@ -243,4 +244,51 @@ exports.verifyMfaOtp = async (req, res) => {
 		},
 		token,
 	});
+};
+
+exports.verifyMfaCode = async (req, res) => {
+	const { tempToken, code } = req.body;
+
+	try {
+		// Step 1: Decode tempToken to get user ID
+		const decoded = jwt.verify(tempToken, process.env.JWT_SECRET);
+		const user = await User.findById(decoded.id);
+		if (!user) return res.status(404).json({ message: "User not found" });
+
+		// Step 2: Verify the code using the stored mfaSecret
+		const verified = speakeasy.totp.verify({
+			secret: user.mfaSecret,
+			encoding: "base32",
+			token: code,
+			window: 1,
+		});
+
+		if (!verified) {
+			return res.status(400).json({ message: "Invalid MFA code" });
+		}
+
+		// Step 3: Generate full token and send
+		const token = jwt.sign(
+			{ id: user._id, role: user.role },
+			process.env.JWT_SECRET,
+			{
+				expiresIn: "30d",
+			}
+		);
+
+		res.json({
+			message: "Login successful",
+			user: {
+				_id: user._id,
+				name: user.name,
+				email: user.email,
+				role: user.role,
+				isMfaEnabled: true,
+			},
+			token,
+		});
+	} catch (err) {
+		console.error("MFA Verification failed:", err);
+		res.status(401).json({ message: "MFA verification failed" });
+	}
 };
