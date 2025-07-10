@@ -69,7 +69,7 @@ exports.loginUser = async (req, res) => {
 	}
 
 	// ✅ If MFA is enabled, return temp token
-	if (user.mfaEnabled) {
+	if (user.isMfaEnabled) {
 		const tempToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
 			expiresIn: "10m",
 		});
@@ -90,7 +90,7 @@ exports.loginUser = async (req, res) => {
 		name: user.name,
 		email: user.email,
 		role: user.role,
-		mfaEnabled: user.mfaEnabled, // ✅ include this
+		isMfaEnabled: user.isMfaEnabled, // ✅ include this
 		token,
 	});
 };
@@ -133,7 +133,7 @@ exports.confirmMfaCode = async (req, res) => {
 	}
 
 	req.user.mfaSecret = secret;
-	req.user.mfaEnabled = true;
+	req.user.isMfaEnabled = true;
 	await req.user.save();
 
 	res.json({ message: "MFA enabled successfully!" });
@@ -186,7 +186,7 @@ exports.requestMfaOtp = async (req, res) => {
 	const { email } = req.body;
 	const user = await User.findOne({ email });
 
-	if (!user || !user.mfaEnabled) {
+	if (!user || !user.isMfaEnabled) {
 		return res.status(400).json({ message: "No MFA enabled for this user." });
 	}
 
@@ -218,7 +218,7 @@ exports.verifyMfaOtp = async (req, res) => {
 	}
 
 	// Disable MFA
-	user.mfaEnabled = false;
+	user.isMfaEnabled = false;
 	user.mfaSecret = undefined;
 	user.resetOtp = undefined;
 	user.resetOtpExpiry = undefined;
@@ -240,7 +240,7 @@ exports.verifyMfaOtp = async (req, res) => {
 			name: user.name,
 			email: user.email,
 			role: user.role,
-			mfaEnabled: false,
+			isMfaEnabled: false,
 		},
 		token,
 	});
@@ -283,7 +283,7 @@ exports.verifyMfaCode = async (req, res) => {
 				name: user.name,
 				email: user.email,
 				role: user.role,
-				mfaEnabled: true,
+				isMfaEnabled: true,
 			},
 			token,
 		});
