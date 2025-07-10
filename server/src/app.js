@@ -29,9 +29,12 @@ const userRouter = require("./routes/userRoute");
 const utilsRoutes = require("./routes/utilsRoute");
 const transactionRoutes = require("./routes/transactionRoutes");
 
+const paymentRoutes = require("./routes/paymentRoutes");
+
 app.use("/api/user", userRouter);
 app.use("/api/utils", utilsRoutes);
 
 app.use("/api/transactions", transactionRoutes);
+app.use("/api/payment", paymentRoutes);
 
 module.exports = app;

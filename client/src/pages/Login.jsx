@@ -104,7 +104,9 @@ export default function Login() {
 				{mfaStep ? (
 					<>
 						<MFAInput onSubmit={handleMfaSubmit} loading={loading} />
-
+						<p>
+							Open your Google Authenticator app and enter the code shown there.
+						</p>
 						<p
 							onClick={() => navigate("/recover-mfa")}
 							className="text-sm text-blue-600 hover:underline mt-4 cursor-pointer text-center">

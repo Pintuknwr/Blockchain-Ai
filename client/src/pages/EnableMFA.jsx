@@ -59,13 +59,11 @@ export default function EnableMFA() {
 		<div className="p-6 max-w-md mx-auto">
 			<h2 className="text-2xl font-bold mb-4"> Enable MFA (2FA)</h2>
 			<h2 className="font-medium text-center">
-				Remember the code you enter for future use.
+				Scan the QR code using Google Authenticator and enter the 6-digit code..
 			</h2>
 			{confirmed ? (
 				<p className="text-green-600 font-medium text-center">
-					✅ MFA is now enabled on your account! <br />
-					Please remember the code you entered. You'll be asked to enter it each
-					time you try to login.
+					✅ MFA is now enabled on your account!
 				</p>
 			) : (
 				<>

@@ -5,3 +5,5 @@ pandas
 xgboost
 joblib
 numpy
+tensorflow
+tensorflow-federated
