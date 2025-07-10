@@ -16,6 +16,7 @@ export default function Login() {
 		confirm: "",
 	});
 	const [error, setError] = useState("");
+	const [success, setSuccess] = useState("");
 	const [loading, setLoading] = useState(false);
 	const [mfaStep, setMfaStep] = useState(false);
 	const [tempToken, setTempToken] = useState(null);
@@ -54,7 +55,7 @@ export default function Login() {
 					password: "",
 					confirm: "",
 				});
-				setError("Account created! Please log in.");
+				setSuccess("Account created! Please log in.");
 			} else {
 				const result = await login(form.email, form.password, clientInfo);
 
@@ -96,17 +97,20 @@ export default function Login() {
 						? "Verify Your Identity"
 						: "Sign In to WalmartLite"}
 				</h2>
-
+				{success && (
+					<p className="text-green-600 font-semibold text-center">{success}</p>
+				)}
 				{error && (
 					<div className="text-red-500 text-sm mb-4 text-center">{error}</div>
 				)}
 
 				{mfaStep ? (
 					<>
-						<MFAInput onSubmit={handleMfaSubmit} loading={loading} />
 						<p>
 							Open your Google Authenticator app and enter the code shown there.
 						</p>
+						<MFAInput onSubmit={handleMfaSubmit} loading={loading} />
+
 						<p
 							onClick={() => navigate("/recover-mfa")}
 							className="text-sm text-blue-600 hover:underline mt-4 cursor-pointer text-center">

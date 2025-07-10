@@ -13,7 +13,7 @@ const stripePromise = loadStripe(
 ); // replace with your publishable key
 
 export default function Checkout() {
-	const { cart } = useCart();
+	const { cart, clearCart } = useCart();
 	const { user } = useAuth();
 	const navigate = useNavigate();
 
@@ -109,10 +109,24 @@ export default function Checkout() {
 						</button>
 					</form>
 				</>
+			) : success ? (
+				<div className="mt-6 text-center">
+					<a
+						href="/"
+						className="inline-block bg-blue-300 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+						Continue Shopping
+					</a>
+				</div>
 			) : (
 				<div className="mt-6">
 					<Elements stripe={stripePromise}>
-						<CheckoutForm amount={amount} onSuccess={() => setSuccess(true)} />
+						<CheckoutForm
+							amount={amount}
+							onSuccess={() => {
+								setSuccess(true);
+								clearCart();
+							}}
+						/>
 					</Elements>
 				</div>
 			)}
