@@ -4,8 +4,6 @@ require("dotenv").config();
 const contractJson = require("./FraudLoggerABI.json");
 
 const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS;
-
-
 const RPC_URL = process.env.RPC_URL;
 
 if (!CONTRACT_ADDRESS || !RPC_URL) {
@@ -13,21 +11,31 @@ if (!CONTRACT_ADDRESS || !RPC_URL) {
 }
 
 const provider = new ethers.JsonRpcProvider(RPC_URL);
-const contract = new ethers.Contract(CONTRACT_ADDRESS, contractJson.abi, provider);
+const contract = new ethers.Contract(
+	CONTRACT_ADDRESS,
+	contractJson.abi,
+	provider
+);
 
-console.log("🔍 Logging to contract address:", contract.target || contract.address);
-
+console.log("🧾 Reading from contract:", CONTRACT_ADDRESS);
 
 async function getLoggedEvents() {
 	try {
-		// In Ethers v6, you can directly use the event name
-		const logs = await contract.queryFilter("FraudLogged");
+		const event = await contract.getEvent("FraudLogged");
+		const logs = await contract.queryFilter(event, 0, "latest"); // ✅ correct for v6
 
-		console.log("📦 Events found:", logs.length);
+		console.log("📦 Events fetched:", logs.length);
 
-		const events = await Promise.all(
+		if (logs.length === 0) {
+			console.log("⚠️ No blockchain logs returned.");
+			return [];
+		}
+
+		const parsed = await Promise.all(
 			logs.map(async (e) => {
 				const block = await provider.getBlock(e.blockNumber);
+				console.log("🔍 Raw log event:", e.args);
+
 				return {
 					txHash: e.transactionHash,
 					txId: e.args.txId,
@@ -41,9 +49,10 @@ async function getLoggedEvents() {
 			})
 		);
 
-		return events;
+		console.log("✅ Parsed logs:", parsed);
+		return parsed;
 	} catch (err) {
-		console.error("❌ Error fetching blockchain logs:", err.message);
+		console.error("❌ Error in getLoggedEvents:", err);
 		throw err;
 	}
 }

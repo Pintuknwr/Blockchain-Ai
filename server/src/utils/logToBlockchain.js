@@ -8,15 +8,23 @@ const PRIVATE_KEY = process.env.PRIVATE_KEY;
 const RPC_URL = process.env.RPC_URL;
 
 if (!CONTRACT_ADDRESS || !PRIVATE_KEY || !RPC_URL) {
-	throw new Error("❌ Missing CONTRACT_ADDRESS, PRIVATE_KEY, or RPC_URL in .env");
+	throw new Error(
+		"❌ Missing CONTRACT_ADDRESS, PRIVATE_KEY, or RPC_URL in .env"
+	);
 }
 
 const provider = new ethers.JsonRpcProvider(RPC_URL);
 const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
-const contract = new ethers.Contract(CONTRACT_ADDRESS, contractJson.abi, wallet);
+const contract = new ethers.Contract(
+	CONTRACT_ADDRESS,
+	contractJson.abi,
+	wallet
+);
 
-console.log("🔍 Logging to contract address:", contract.target || contract.address);
-
+console.log(
+	"🔍 Logging to contract address:",
+	contract.target || contract.address
+);
 
 async function logToBlockchain(txId, user, amount, reason, isFraud) {
 	try {

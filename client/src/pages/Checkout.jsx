@@ -8,7 +8,9 @@ import { loadStripe } from "@stripe/stripe-js";
 import CheckoutForm from "../components/CheckoutForm";
 import axios from "axios";
 
-const stripePromise = loadStripe("pk_test_51Rir2YQWHckvDNPihSBik5iKlstJjKk8j0gF7L1XPQ9Xw8Q8snkZrEjnQBF1wa7VfsJx92Z41XNLGbmvrZ5Lr8nn00sn9YZ4AW"); // replace with your publishable key
+const stripePromise = loadStripe(
+	"pk_test_51Rir2YQWHckvDNPihSBik5iKlstJjKk8j0gF7L1XPQ9Xw8Q8snkZrEjnQBF1wa7VfsJx92Z41XNLGbmvrZ5Lr8nn00sn9YZ4AW"
+); // replace with your publishable key
 
 export default function Checkout() {
 	const { cart } = useCart();
@@ -29,13 +31,11 @@ export default function Checkout() {
 
 	// Simulated 30-feature input
 	//const features = Array(30).fill(0).map((_, i) => Math.random());
-const features = [
-  -1.203, 0.445, 1.243, -0.003, 0.294, -1.125, 0.872, 0.651,
-  -0.427, 1.903, -0.377, 0.456, -1.114, 0.110, 0.003, 1.784,
-  -0.765, 0.223, -0.915, 0.778, 1.056, -0.644, 0.230, 1.342,
-  0.410, -0.132, 0.755, 0.614, 12.56, 18000.0
-];
-
+	const features = [
+		-1.203, 0.445, 1.243, -0.003, 0.294, -1.125, 0.872, 0.651, -0.427, 1.903,
+		-0.377, 0.456, -1.114, 0.11, 0.003, 1.784, -0.765, 0.223, -0.915, 0.778,
+		1.056, -0.644, 0.23, 1.342, 0.41, -0.132, 0.755, 0.614, 12.56, 18000.0,
+	];
 
 	const handleVerify = async () => {
 		setLoading(true);
@@ -62,7 +62,10 @@ const features = [
 			setAmount(subtotal);
 			setTxId(res.data.txId);
 		} catch (err) {
-			console.error("❌ Fraud Check Failed:", err.response?.data || err.message);
+			console.error(
+				"❌ Fraud Check Failed:",
+				err.response?.data || err.message
+			);
 			setError(err.response?.data?.error || "Transaction blocked.");
 		} finally {
 			setLoading(false);
