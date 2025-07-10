@@ -11,7 +11,6 @@ import Login from "./pages/Login";
 import AdminDashboard from "./pages/AdminDashboard";
 
 import EnableMFA from "./pages/EnableMFA";
-
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import RecoverMFA from "./pages/RecoverMFA";
