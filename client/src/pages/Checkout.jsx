@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-import CheckoutForm from "../components/CheckoutForm";
+import CheckoutForm from "../components/checkoutForm.jsx";
 import axios from "axios";
 
 const stripePromise = loadStripe(
