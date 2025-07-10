@@ -55,7 +55,7 @@ export function AuthProvider({ children }) {
 				name: res.data.name,
 				email: res.data.email,
 				role: res.data.role,
-				mfaEnabled: res.data.mfaEnabled,
+				isMfaEnabled: res.data.isMfaEnabled,
 			});
 
 			return { mfaRequired: false };
@@ -76,7 +76,7 @@ export function AuthProvider({ children }) {
 				name: res.data.user.name,
 				email: res.data.user.email,
 				role: res.data.user.role,
-				mfaEnabled: res.data.user.mfaEnabled,
+				isMfaEnabled: res.data.user.isMfaEnabled, // ✅ include this
 			});
 		} catch (err) {
 			throw new Error(err.response?.data?.message || "2FA failed");
