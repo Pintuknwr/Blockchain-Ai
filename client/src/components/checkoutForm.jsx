@@ -16,7 +16,9 @@ const CheckoutForm = ({ amount, onSuccess }) => {
 
 		try {
 			// 1. Get clientSecret from your backend
-			const { data } = await axios.post("/api/payment/create-payment-intent", { amount });
+			const { data } = await axios.post("/api/payment/create-payment-intent", {
+				amount,
+			});
 
 			// 2. Confirm card payment
 			const result = await stripe.confirmCardPayment(data.clientSecret, {
@@ -42,7 +44,9 @@ const CheckoutForm = ({ amount, onSuccess }) => {
 	};
 
 	return (
-		<form onSubmit={handleSubmit} className="space-y-4 max-w-md mx-auto p-4 border rounded shadow">
+		<form
+			onSubmit={handleSubmit}
+			className="space-y-4 max-w-md mx-auto p-4 border rounded shadow">
 			<CardElement
 				options={{
 					style: {
@@ -65,8 +69,7 @@ const CheckoutForm = ({ amount, onSuccess }) => {
 			<button
 				type="submit"
 				disabled={!stripe || processing}
-				className="w-full py-3 bg-green-600 text-white font-semibold rounded hover:bg-green-700 disabled:opacity-50"
-			>
+				className="w-full py-3 bg-green-600 text-white font-semibold rounded hover:bg-green-700 disabled:opacity-50">
 				{processing ? "Processing..." : `Pay $${amount}`}
 			</button>
 		</form>

@@ -3,7 +3,9 @@ import CartItem from "../components/CartItem";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function Cart() {
-	const { cart, updateQty, removeItem } = useCart();
+	const { cart, saved, updateQty, removeItem, saveForLater, moveToCart } =
+		useCart();
+
 	const navigate = useNavigate();
 
 	const subtotal = cart.reduce(
@@ -36,8 +38,35 @@ export default function Cart() {
 									item={item}
 									updateQty={updateQty}
 									removeItem={removeItem}
+									saveForLater={saveForLater} // ✅ added
 								/>
 							))}
+						</div>
+					)}
+
+					{/* Saved for Later Section */}
+					{saved.length > 0 && (
+						<div className="mt-10">
+							<h3 className="text-xl font-semibold mb-4 text-gray-800">
+								Saved for Later ({saved.length})
+							</h3>
+							<div className="space-y-4">
+								{saved.map((item) => (
+									<div
+										key={item.id}
+										className="flex items-center justify-between p-4 bg-white rounded shadow">
+										<div>
+											<p className="font-semibold">{item.name}</p>
+											<p className="text-gray-600">${item.price}</p>
+										</div>
+										<button
+											className="text-blue-600 hover:text-blue-900 text-sm"
+											onClick={() => moveToCart(item.id)}>
+											Move to Cart
+										</button>
+									</div>
+								))}
+							</div>
 						</div>
 					)}
 				</div>

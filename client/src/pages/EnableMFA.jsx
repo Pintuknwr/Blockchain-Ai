@@ -1,12 +1,26 @@
-import { useState } from "react";
-import axios from "../api/axios"; // your axios instance
+import { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
+import axios from "../api/axios";
 
 export default function EnableMFA() {
+	const { user, loading: authLoading } = useAuth(); // add loading flag
 	const [qrUrl, setQrUrl] = useState(null);
 	const [secret, setSecret] = useState("");
 	const [code, setCode] = useState("");
 	const [confirmed, setConfirmed] = useState(false);
 	const [error, setError] = useState("");
+
+	// If auth is loading, show loading text
+	if (authLoading) {
+		return <p className="text-center mt-10">Loading...</p>;
+	}
+
+	// If user is not logged in
+	if (!user) {
+		return (
+			<p className="text-center text-red-600 mt-10">❌ Please log in first.</p>
+		);
+	}
 
 	const fetchSecret = async () => {
 		try {
@@ -57,11 +71,13 @@ export default function EnableMFA() {
 
 	return (
 		<div className="p-6 max-w-md mx-auto">
-			<h2 className="text-2xl font-bold mb-4"> Enable MFA (2FA)</h2>
-			<h2 className="font-medium text-center">
-				Scan the QR code using Google Authenticator and enter the 6-digit code..
-			</h2>
-			{confirmed ? (
+			<h2 className="text-2xl font-bold mb-4">Enable MFA (2FA)</h2>
+
+			{user?.isMfaEnabled ? (
+				<p className="text-green-600 font-medium text-center">
+					✅ MFA is already enabled for your account.
+				</p>
+			) : confirmed ? (
 				<p className="text-green-600 font-medium text-center">
 					✅ MFA is now enabled on your account!
 				</p>
