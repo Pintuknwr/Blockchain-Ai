@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-import CheckoutForm from "../components/CheckoutForm";
+import CheckoutForm from "../components/checkoutForm.jsx";
 import axios from "axios";
 
 const stripePromise = loadStripe("pk_test_51Rir2YQWHckvDNPihSBik5iKlstJjKk8j0gF7L1XPQ9Xw8Q8snkZrEjnQBF1wa7VfsJx92Z41XNLGbmvrZ5Lr8nn00sn9YZ4AW"); // replace with your publishable key
