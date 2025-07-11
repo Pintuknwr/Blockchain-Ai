@@ -71,8 +71,12 @@ export default function Navbar() {
 							</Link>
 
 							<button
-								onClick={logout}
-								className="px-3 py-1 rounded hover:bg-red-400 transition">
+								onClick={() => {
+									const confirmLogout = window.confirm(
+										"Are you sure you want to logout?"
+									);
+									if (confirmLogout) logout();
+								}}>
 								Logout
 							</button>
 						</div>
