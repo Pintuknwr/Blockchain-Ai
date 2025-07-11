@@ -43,7 +43,7 @@ export default function AdminDashboard() {
 	}
 
 	return (
-		<div className="p-8 max-w-6xl mx-auto">
+		<div className="p-8 max-w-6xl mx-auto overflow-x-auto">
 			<h1 className="text-3xl font-bold mb-6 text-blue-800">Admin Dashboard</h1>
 
 			{error && <p className="text-red-500 mb-4">{error}</p>}
@@ -51,7 +51,7 @@ export default function AdminDashboard() {
 			{logs.length === 0 ? (
 				<p className="text-gray-600">No transactions found.</p>
 			) : (
-				<table className="w-full border rounded overflow-hidden shadow text-sm bg-white">
+				<table className="border rounded overflow-hidden shadow text-sm bg-white">
 					<thead className="bg-blue-100 text-blue-900">
 						<tr>
 							<th className="px-4 py-2 text-left">Tx Hash</th>
@@ -70,7 +70,7 @@ export default function AdminDashboard() {
 								className="border-t hover:bg-gray-50 transition duration-150">
 								<td className="px-4 py-2 text-blue-600">{log.txHash}</td>
 								<td className="px-4 py-2">{log.user}</td>
-								<td className="px-4 py-2">${(log.amount / 100).toFixed(2)}</td>
+								<td className="px-4 py-2">${log.amount.toFixed(2)}</td>
 								<td
 									className={`px-4 py-2 font-medium ${
 										(log.status || "").toLowerCase() === "fraud"

@@ -2,60 +2,72 @@ const User = require("../models/userModels.js");
 const jwt = require("jsonwebtoken");
 const speakeasy = require("speakeasy");
 const qrcode = require("qrcode");
+const validateEmail = require("../utils/validateEmail");
+const validator = require("validator");
+
+const majorDomains = [
+	"gmail.com",
+	"yahoo.com",
+	"hotmail.com",
+	"outlook.com",
+	"protonmail.com",
+	"icloud.com",
+	"aol.com",
+	"zoho.com",
+];
 const sendEmail = require("../utils/sendEmail");
 
 // Generate token
 const generateToken = (id, role) => {
 	return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: "30d" });
 };
-
 // @desc Register user
 exports.registerUser = async (req, res) => {
 	const { name, email, password } = req.body;
 
-	// Basic validation
 	if (!name || !email || !password) {
 		return res
 			.status(400)
 			.json({ message: "Please provide name, email, and password." });
 	}
 
-	try {
-		const userExists = await User.findOne({ email });
-		if (userExists) {
-			return res
-				.status(400)
-				.json({ message: "User with this email already exists." });
-		}
+	// Basic format check
+	if (!validator.isEmail(email)) {
+		return res.status(400).json({ message: "Invalid email format." });
+	}
 
-		// Try to create the user
-		const user = new User({ name, email, password });
-		const savedUser = await user.save();
-
-		// Check if saved successfully
-		if (!savedUser || !savedUser._id) {
-			return res
-				.status(500)
-				.json({ message: "User creation failed. Could not save to database." });
-		}
-
-		// Return success response
-		return res.status(201).json({
-			message: "User created successfully",
-			user: {
-				_id: savedUser._id,
-				name: savedUser.name,
-				email: savedUser.email,
-				role: savedUser.role,
-			},
-			token: generateToken(savedUser._id, savedUser.role),
+	// Domain check
+	const domain = email.split("@")[1];
+	if (!majorDomains.includes(domain)) {
+		return res.status(400).json({
+			message: "Please use a valid email from Gmail, Yahoo, Outlook, etc.",
 		});
+	}
+
+	// API-level email existence check
+	const { valid, reason } = await validateEmail(email);
+	if (!valid) {
+		return res.status(400).json({
+			message: "Email validation failed. Please use a real, deliverable email.",
+			details: reason,
+		});
+	}
+
+	try {
+		const existingUser = await User.findOne({ email });
+		if (existingUser) {
+			return res.status(400).json({ message: "Email already in use." });
+		}
+
+		const newUser = new User({ name, email, password });
+		await newUser.save();
+
+		res.status(201).json({ message: "User registered successfully!" });
 	} catch (error) {
 		console.error("Registration Error:", error);
-		return res.status(500).json({
-			message: "Internal server error during registration",
-			error: error.message || "Unknown error",
-		});
+		res
+			.status(500)
+			.json({ message: "Internal server error", error: error.message });
 	}
 };
 
