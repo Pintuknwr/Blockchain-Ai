@@ -16,6 +16,7 @@ import "react-toastify/dist/ReactToastify.css";
 import RecoverMFA from "./pages/RecoverMFA";
 import ForgotPasswordOtp from "./pages/ForgotPasswordOtp";
 
+import OrderHistory from "./pages/OrderHistory";
 function App() {
 	return (
 		<div className="bg-gray-100 dark:bg-gray-900 min-h-screen flex flex-col">
@@ -30,6 +31,7 @@ function App() {
 					<Route path="/admin" element={<AdminDashboard />} />
 					<Route path="/settings/security" element={<EnableMFA />} />
 					<Route path="/recover-mfa" element={<RecoverMFA />} />
+					<Route path="/orders" element={<OrderHistory />} />
 					<Route path="/forgot-password" element={<ForgotPasswordOtp />} />
 				</Routes>
 				<ToastContainer position="top-right" autoClose={2000} />

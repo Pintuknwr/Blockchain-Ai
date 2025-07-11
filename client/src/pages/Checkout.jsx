@@ -113,8 +113,8 @@ export default function Checkout() {
 				<div className="mt-6 text-center">
 					<a
 						href="/"
-						className="inline-block bg-blue-300 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
-						Continue Shopping
+						className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800 transition">
+						Continue Shopping...
 					</a>
 				</div>
 			) : (

@@ -62,7 +62,7 @@ export default function Navbar() {
 
 							<Link
 								to="/settings/security"
-								className="px-3 py-1 rounded text-white hover:bg-yellow-300 transition"
+								className="px-1 py-1 rounded text-white hover:bg-yellow-300 transition"
 								title="Manage 2FA (MFA)">
 								Security
 								{user?.isMfaEnabled && (
@@ -70,13 +70,22 @@ export default function Navbar() {
 								)}
 							</Link>
 
+							{localStorage.getItem("token") && (
+								<Link
+									to="/orders"
+									className="text-sm py-2 hover:text-yellow-300">
+									My Orders
+								</Link>
+							)}
+
 							<button
 								onClick={() => {
 									const confirmLogout = window.confirm(
 										"Are you sure you want to logout?"
 									);
 									if (confirmLogout) logout();
-								}}>
+								}}
+								className="px-1 py-1 rounded text-white hover:bg-red-500 transition">
 								Logout
 							</button>
 						</div>

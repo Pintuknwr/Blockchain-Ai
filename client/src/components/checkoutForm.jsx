@@ -15,25 +15,48 @@ const CheckoutForm = ({ amount, onSuccess }) => {
 		setError("");
 
 		try {
-			// 1. Get clientSecret from your backend
 			const { data } = await axios.post("/api/payment/create-payment-intent", {
 				amount,
 			});
 
-			// 2. Confirm card payment
 			const result = await stripe.confirmCardPayment(data.clientSecret, {
 				payment_method: {
 					card: elements.getElement(CardElement),
 				},
 			});
 
-			// 3. Handle result
 			if (result.error) {
 				console.error("❌ Stripe Payment Error:", result.error.message);
 				setError(result.error.message);
 			} else if (result.paymentIntent.status === "succeeded") {
 				console.log("✅ Payment succeeded:", result.paymentIntent.id);
-				onSuccess(); // Notify parent to show success
+
+				try {
+					const token = localStorage.getItem("token");
+					const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+
+					await axios.post(
+						"/api/payment/save-order",
+						{
+							items: cartItems,
+							totalAmount: amount,
+							paymentIntentId: result.paymentIntent.id,
+						},
+						{
+							headers: {
+								Authorization: `Bearer ${token}`,
+							},
+						}
+					);
+
+					localStorage.removeItem("cartItems");
+					localStorage.removeItem("totalAmount");
+
+					onSuccess();
+				} catch (err) {
+					console.error("❌ Failed to save order:", err);
+					setError("Payment successful, but saving order failed.");
+				}
 			}
 		} catch (err) {
 			console.error("❌ Payment Intent Error:", err.message);

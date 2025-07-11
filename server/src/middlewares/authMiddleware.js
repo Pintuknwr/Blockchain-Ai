@@ -25,3 +25,16 @@ exports.adminOnly = (req, res, next) => {
 	}
 	next();
 };
+
+exports.verifyToken = (req, res, next) => {
+	const token = req.headers.authorization?.split(" ")[1];
+	if (!token) return res.status(401).json({ message: "Missing token" });
+
+	try {
+		const decoded = jwt.verify(token, process.env.JWT_SECRET);
+		req.user = decoded; // { id: userId, role: 'user' }
+		next();
+	} catch (err) {
+		res.status(400).json({ message: "Invalid token" });
+	}
+};

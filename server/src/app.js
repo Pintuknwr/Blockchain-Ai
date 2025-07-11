@@ -1,5 +1,5 @@
 const express = require("express");
-//const dotenv = require('dotenv');
+
 const mongoose = require("mongoose");
 const cors = require("cors");
 //const morgan = require('morgan');
@@ -28,7 +28,7 @@ app.use(cookieParser());
 const userRouter = require("./routes/userRoute");
 const utilsRoutes = require("./routes/utilsRoute");
 const transactionRoutes = require("./routes/transactionRoutes");
-
+const orderRoutes = require("./routes/orderRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 
 app.use("/api/user", userRouter);
@@ -36,5 +36,6 @@ app.use("/api/utils", utilsRoutes);
 
 app.use("/api/transactions", transactionRoutes);
 app.use("/api/payment", paymentRoutes);
+app.use("/api/orders", orderRoutes);
 
 module.exports = app;
