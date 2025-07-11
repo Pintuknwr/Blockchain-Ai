@@ -142,7 +142,7 @@ We achieved **integration** across all these fronts—bringing together diverse 
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ```bash
 git clone https://github.com/Pintuknwr/Blockchain-Ai.git
@@ -172,7 +172,7 @@ MODEL_PATH=model.joblib
 
 ---
 
-## 🛠️ Installation & Dev
+## Installation & Dev
 
 ### ML Model
 
