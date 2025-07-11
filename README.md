@@ -177,7 +177,7 @@ MODEL_PATH=model.joblib
 ### ML Model
 
 ```bash
-cd ../ml-model
+cd ml-model
 pip install -r requirements.txt
 uvicorn main:app --reload
 ```
@@ -185,7 +185,7 @@ uvicorn main:app --reload
 ### Blockchain (Local)
 
 ```bash
-cd ../blockchain
+cd blockchain
 npx hardhat compile
 npx hardhat node
 npx hardhat run scripts/deploy.js --network localhost
@@ -194,7 +194,7 @@ npx hardhat run scripts/deploy.js --network localhost
 ### Server
 
 ```bash
-cd ../server
+cd server
 npm install
 npm run dev
 ```
