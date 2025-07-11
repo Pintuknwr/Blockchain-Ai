@@ -30,12 +30,8 @@ export default function Checkout() {
 	);
 
 	// Simulated 30-feature input
-	//const features = Array(30).fill(0).map((_, i) => Math.random());
-	const features = [
-		-1.203, 0.445, 1.243, -0.003, 0.294, -1.125, 0.872, 0.651, -0.427, 1.903,
-		-0.377, 0.456, -1.114, 0.11, 0.003, 1.784, -0.765, 0.223, -0.915, 0.778,
-		1.056, -0.644, 0.23, 1.342, 0.41, -0.132, 0.755, 0.614, 12.56, 18000.0,
-	];
+	const features = Array(30).fill(0).map((_, i) => Math.random());
+
 
 	const handleVerify = async () => {
 		setLoading(true);

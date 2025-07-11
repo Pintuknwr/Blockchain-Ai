@@ -36,7 +36,13 @@ exports.checkout = async (req, res) => {
 	try {
 		console.log("✅ Checkout API hit");
 
-		const isFraud = false;
+		const mlResponse = await axios.post("http://localhost:8000/predict", {
+			features,
+		});
+
+		const isFraud = mlResponse.data.fraud;
+
+		
 		const reason = isFraud ? "fraud" : "normal";
 
 		const txId = crypto
